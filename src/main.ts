@@ -1,8 +1,11 @@
 import { Bot } from './core/bot.js';
+import { loadCommands } from './handlers/commandHandler.js';
 
 const botInstance = new Bot();
 
-botInstance.start().catch((error: Error) => {
-    console.error('Erro ao iniciar o bot:', error);
-    process.exit(1);
+loadCommands(botInstance).then(() => {
+    botInstance.start().catch((error: Error) => {
+        console.error('Erro ao iniciar o bot:', error);
+        process.exit(1);
+    });
 });
