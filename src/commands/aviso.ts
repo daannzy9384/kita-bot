@@ -8,7 +8,7 @@ import {
 export const data = new SlashCommandBuilder()
     .setName('aviso')
     .setDescription('Envia um aviso importante em um embed bonitão.')
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator) // Só admins podem usar
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator) 
     .addStringOption(option =>
         option.setName('titulo')
             .setDescription('O título do seu aviso')
@@ -29,18 +29,18 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
     const embed = new EmbedBuilder()
         .setTitle(`📢 ${titulo}`)
-        .setDescription(mensagem.replace(/\\n/g, '\n')) // Permite pular linha usando \n
-        .setColor('#5865F2') // Cor Blurple do Discord
+        .setDescription(mensagem.replace(/\\n/g, '\n')) 
+        .setColor('#5865F2') 
         .setTimestamp()
         .setFooter({ 
             text: `Enviado por ${interaction.user.username}`, 
             iconURL: interaction.user.displayAvatarURL() 
         });
 
-    // Responde primeiro para o comando não expirar
+    
     await interaction.reply({ content: 'Aviso enviado com sucesso!', ephemeral: true });
 
-    // Envia o aviso no canal atual
+    
     if (interaction.channel?.isSendable()) {
         if (cargo) {
             await interaction.channel.send({ 
