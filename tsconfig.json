@@ -1,8 +1,8 @@
 {
-  "include": ["src/**/*.ts", "*.ts", ".env"], 
+  "include": ["src/**/*.ts"], 
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "rootDir": "./",
+    "rootDir": "src",
     "outDir": "./dist",
 
     "module": "NodeNext",
@@ -12,13 +12,10 @@
     "skipLibCheck": true,
 
     "esModuleInterop": true,
-    "verbatimModuleSyntax": true,
     "isolatedModules": true,
 
     "sourceMap": false,
     "declaration": false,
-    "declarationMap": false,
-
     "moduleDetection": "force"
   }
 }
