@@ -1,5 +1,7 @@
 import { Bot } from './core/bot.js';
 import { loadCommands } from './handlers/commandHandler.js';
+import "./db/connection.js"
+
 
 const botInstance = new Bot();
 
