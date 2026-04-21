@@ -18,35 +18,33 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const userId = interaction.user.id;
     const guildId = interaction.guildId!;
 
-    // 🔥 Puxa dados reais
     const userData = XpSystem.getXpData(userId, guildId);
 
     const nivel = userData.level;
     const xpAtual = userData.xp;
-
-    // 🧠 Calcula XP necessário pro próximo nível
-    const proximoNivel = nivel + 1;
-    const xpNecessario = Math.pow(proximoNivel / 0.1, 2);
-
     const nome = interaction.user.username;
 
-    // --- Barra ---
-    const tamanhoBarra = 15;
-    const progresso = Math.max(0, Math.min(xpAtual / xpNecessario, 1));
+    const xpBaseNivelAtual = Math.pow(nivel / 0.1, 2);
+    const xpParaProximoNivel = Math.pow((nivel + 1) / 0.1, 2);
+    
+    const xpGanhoNoNivel = xpAtual - xpBaseNivelAtual;
+    const totalNecessarioNivel = xpParaProximoNivel - xpBaseNivelAtual;
 
-    const preenchido = Math.floor(tamanhoBarra * progresso);
+    const tamanhoBarra = 15;
+    const progresso = Math.max(0, Math.min(xpGanhoNoNivel / totalNecessarioNivel, 1));
+    
+    const preenchido = Math.round(tamanhoBarra * progresso);
     const vazio = tamanhoBarra - preenchido;
 
     const barraTexto = "▰".repeat(preenchido) + "▱".repeat(vazio);
     const porcentagem = Math.floor(progresso * 100);
-
-    const falta = Math.max(0, Math.floor(xpNecessario - xpAtual));
+    const falta = Math.ceil(xpParaProximoNivel - xpAtual);
 
     const layout = [
         `**PROTAGONISTA:** ${nome}`,
         `**NÍVEL:** \`${nivel}\``,
         `${barraTexto}  \`${porcentagem}%\``,
-        `**XP:** \`${xpAtual}\` / \`${Math.floor(xpNecessario)}\``,
+        `**XP:** \`${Math.floor(xpAtual)}\` / \`${Math.floor(xpParaProximoNivel)}\``,
         `Faltam \`${falta}\` para o próximo nível`
     ].join("\n");
 
