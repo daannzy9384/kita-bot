@@ -1,7 +1,0 @@
-node_modules
-.env
-package-lock.json
-database.db
-database.db-shm
-database.db-wal
-dist
