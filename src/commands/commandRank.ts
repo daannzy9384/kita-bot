@@ -1,38 +1,53 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { XpSystem } from "../systems/xpSystem.js";
 
 export const data = new SlashCommandBuilder()
     .setName("ranking")
     .setDescription("Verifica seu progresso atual");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-    const SEU_ID = "698227147663474768"; // Coloque seu ID aqui
+    const SEU_ID = "698227147663474768";
 
     if (interaction.user.id !== SEU_ID) {
-        return interaction.reply({ content: "Comando em fase de testes.", ephemeral: true });
+        return interaction.reply({
+            content: "Comando em fase de testes.",
+            ephemeral: true
+        });
     }
 
-    // --- Simulação de dados (Puxe do seu xpSystem.ts depois) ---
-    const nivel = 12;
-    const xpAtual = 750;
-    const xpNecessario = 1200;
+    const userId = interaction.user.id;
+    const guildId = interaction.guildId!;
+
+    // 🔥 Puxa dados reais
+    const userData = XpSystem.getXpData(userId, guildId);
+
+    const nivel = userData.level;
+    const xpAtual = userData.xp;
+
+    // 🧠 Calcula XP necessário pro próximo nível
+    const proximoNivel = nivel + 1;
+    const xpNecessario = Math.pow(proximoNivel / 0.1, 2);
+
     const nome = interaction.user.username;
 
-    // --- Lógica da Barra Fina ---
-    const tamanhoBarra = 15; // Quantidade de caracteres na barra
-    const progresso = Math.min(xpAtual / xpNecessario, 1);
-    const preenchido = Math.round(tamanhoBarra * progresso);
+    // --- Barra ---
+    const tamanhoBarra = 15;
+    const progresso = Math.max(0, Math.min(xpAtual / xpNecessario, 1));
+
+    const preenchido = Math.floor(tamanhoBarra * progresso);
     const vazio = tamanhoBarra - preenchido;
 
-    // Caracteres: ▰ (preenchido) e ▱ (vazio)
     const barraTexto = "▰".repeat(preenchido) + "▱".repeat(vazio);
     const porcentagem = Math.floor(progresso * 100);
 
-    // --- Montagem da Mensagem ---
+    const falta = Math.max(0, Math.floor(xpNecessario - xpAtual));
+
     const layout = [
         `**PROTAGONISTA:** ${nome}`,
         `**NÍVEL:** \`${nivel}\``,
         `${barraTexto}  \`${porcentagem}%\``,
-        `**XP:** \`${xpAtual}\` / \`${xpNecessario}\` (Faltam \`${xpNecessario - xpAtual}\` para o próximo nível)`
+        `**XP:** \`${xpAtual}\` / \`${Math.floor(xpNecessario)}\``,
+        `Faltam \`${falta}\` para o próximo nível`
     ].join("\n");
 
     await interaction.reply({
