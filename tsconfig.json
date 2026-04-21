@@ -1,0 +1,21 @@
+{
+  "include": ["src/**/*.ts"], 
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "./dist",
+
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "strict": true,
+    "skipLibCheck": true,
+
+    "esModuleInterop": true,
+    "isolatedModules": true,
+
+    "sourceMap": false,
+    "declaration": false,
+    "moduleDetection": "force"
+  }
+} 
