@@ -1,7 +1,14 @@
 import Database from 'better-sqlite3';
 import { join } from 'path';
+import fs from 'fs';
 
-const db = new Database(join(process.cwd(), 'database.db'));
+const dataDir = join(process.cwd(), 'data');
+
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const db = new Database(join(dataDir, 'database.db'));
 
 db.pragma('journal_mode = WAL');
 

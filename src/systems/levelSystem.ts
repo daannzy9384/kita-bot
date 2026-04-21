@@ -8,8 +8,8 @@ export class LevelSystem {
         const result = XpSystem.giveXp(message.author.id, message.guild.id);
 
         if (result?.leveledUp) {
-            message.reply(`Parabéns **${message.author.username}**! Você subiu para o nível **${result.newLevel}**! 🚀`);
-            
+            console.log(`[LEVEL-UP] ${message.author.username} chegou ao nível ${result.newLevel}`);
+
             // Aqui você pode chamar uma função para verificar e dar cargos
             // ex: this.checkRoleRewards(message, result.newLevel);
         }
