@@ -1,5 +1,5 @@
 import db from '../db/connection.js';
-import type{ UserXp } from '../db/models/UserXp.js';
+import type { UserXp } from '../db/models/UserXp.js';
 
 export class XpSystem {
     private static COOLDOWN = 60000;
@@ -8,7 +8,7 @@ export class XpSystem {
         const row = db.prepare('SELECT * FROM user_xp WHERE userId = ? AND guildId = ?').get(userId, guildId) as UserXp;
         
         if (!row) {
-            const newData = { userId, guildId, xp: 0, level: 0, lastMessageAt: 0 };
+            const newData: UserXp = { userId, guildId, xp: 0, level: 0, lastMessageAt: 0 };
             db.prepare('INSERT INTO user_xp (userId, guildId, xp, level, lastMessageAt) VALUES (?, ?, 0, 0, 0)')
               .run(userId, guildId);
             return newData;
@@ -16,7 +16,7 @@ export class XpSystem {
         return row;
     }
 
-    static giveXp(userId: string, guildId: string): { leveledUp: boolean, newLevel: number } | null {
+    static giveXp(userId: string, guildId: string): { leveledUp: boolean, newLevel: number, newXp: number } | null {
         const user = this.getXpData(userId, guildId);
         const now = Date.now();
 
@@ -30,6 +30,6 @@ export class XpSystem {
         db.prepare('UPDATE user_xp SET xp = ?, level = ?, lastMessageAt = ? WHERE userId = ? AND guildId = ?')
           .run(newXp, newLevel, now, userId, guildId);
 
-        return { leveledUp, newLevel };
+        return { leveledUp, newLevel, newXp };
     }
 }
