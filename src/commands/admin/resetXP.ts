@@ -1,9 +1,10 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import db from '../../db/connection.js';
+import { RANKS } from '../../systems/rankSystem.js';
 
 export const data = new SlashCommandBuilder()
   .setName('reset-xp-geral')
-  .setDescription('Limpa todos os dados de XP do banco de dados')
+  .setDescription('Limpa todos os dados de XP e remove os cargos de rank de todos os membros')
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 
 export async function execute(interaction: ChatInputCommandInteraction) {
@@ -11,10 +12,32 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     return interaction.reply({ content: 'Acesso negado.', ephemeral: true });
   }
 
+  await interaction.deferReply({ ephemeral: true });
+
   try {
     db.prepare('DELETE FROM user_xp').run();
-    await interaction.reply({ content: 'O banco de dados de XP foi resetado com sucesso!', ephemeral: true });
+
+    const guild = interaction.guild;
+    if (!guild) {
+      return interaction.editReply({ content: 'Erro: Servidor não encontrado.' });
+    }
+
+    const roleIdsToRemove = RANKS.map(rank => rank.id);
+    const members = await guild.members.fetch();
+
+    for (const [memberId, member] of members) {
+      const hasRankRole = member.roles.cache.some(role => roleIdsToRemove.includes(role.id));
+      
+      if (hasRankRole) {
+        await member.roles.remove(roleIdsToRemove).catch(() => null);
+      }
+    }
+
+    await interaction.editReply({ 
+      content: 'O banco de dados foi resetado e todos os cargos de rank foram removidos com sucesso!' 
+    });
   } catch (error) {
-    await interaction.reply({ content: 'Erro ao resetar o banco.', ephemeral: true });
+    console.error(error);
+    await interaction.editReply({ content: 'Erro ao processar o reset de XP e cargos.' });
   }
 }
