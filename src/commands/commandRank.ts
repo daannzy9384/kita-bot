@@ -2,6 +2,18 @@ import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from '
 import { XpSystem } from '../systems/xpSystem.js';
 import { RankSystem } from '../systems/rankSystem.js';
 
+function createProgressBar(current: number, total: number, size: number = 10) {
+  const progress = Math.min(Math.max(current / total, 0), 1);
+  const filledSize = Math.round(progress * size);
+  const emptySize = size - filledSize;
+  
+  const filledBar = "🟩".repeat(filledSize);
+  const emptyBar = "⬛".repeat(emptySize);
+  const percentage = Math.round(progress * 100);
+
+  return `${filledBar}${emptyBar} ${percentage}%`;
+}
+
 export const data = new SlashCommandBuilder()
   .setName("ranking")
   .setDescription("Verifica seu progresso atual");
@@ -20,15 +32,18 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const guildId = interaction.guildId!;
   const userData = XpSystem.getXpData(userId, guildId);
   const rank = RankSystem.getRankInfo(userData.xp);
+  
+  const progressBar = createProgressBar(userData.xp, rank.nextMilestoneXP || userData.xp);
 
   const embed = new EmbedBuilder()
     .setColor('#1DB954')
-    .setTitle(`PROTAGONISTA: ${interaction.user.username}`)
+    .setTitle(`RANKING: ${interaction.user.username}`)
     .setThumbnail(interaction.user.displayAvatarURL())
     .addFields(
       { name: 'NÍVEL', value: `${userData.level}`, inline: true },
       { name: 'CARGO', value: `${rank.roleName}`, inline: true },
       { name: 'DIVISÃO', value: `${rank.division || '—'}`, inline: true },
+      { name: 'PROGRESSO', value: progressBar, inline: false },
       { name: 'XP ATUAL', value: `${userData.xp}`, inline: false }
     );
 
@@ -39,4 +54,3 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   await interaction.reply({ embeds: [embed] });
 }
-
